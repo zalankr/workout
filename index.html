@@ -111,12 +111,12 @@ main{flex:1;padding:8px 16px 40px;}
 /* SET ROWS */
 .set-row{display:flex;align-items:center;gap:8px;padding:12px 0;border-top:1px solid var(--line);}
 .set-lbl{width:auto;min-width:90px;font-size:17px;font-weight:700;color:#dce8f5;flex-shrink:0;line-height:1.35;}
-.set-in{width:60px;background:#1e2a3a;border:1.5px solid #3a4a60;border-radius:10px;
+.set-in{width:64px;background:#243349;border:1.5px solid #4a5f7d;border-radius:10px;
   color:#ffffff !important;text-align:center;font-size:26px;font-weight:900;padding:9px 2px;font-family:'Bebas Neue';
   -webkit-text-fill-color:#ffffff !important;caret-color:#ffffff;opacity:1;text-shadow:0 0 8px rgba(255,255,255,0.6);}
-.set-in:focus{outline:none;border-color:var(--accent);background:#253347;}
-.set-in::placeholder{color:#4a5a70;-webkit-text-fill-color:#4a5a70;text-shadow:none;}
-.set-unit{font-size:15px;color:#b8c8dc;width:18px;}
+.set-in:focus{outline:none;border-color:var(--accent);background:#2b3d57;}
+.set-in::placeholder{color:#a8bdd6 !important;-webkit-text-fill-color:#a8bdd6 !important;opacity:1;text-shadow:none;}
+.set-unit{font-size:15px;color:#c8d8ec;width:18px;}
 .set-done-btn{margin-left:auto;background:var(--accent);color:#0e0820;border:none;
   border-radius:9px;padding:11px 16px;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;}
 .set-done-btn.done{background:var(--green);color:#04130c;}
@@ -424,7 +424,7 @@ const DATA = {
        sets:[9,8,8,7],goal:"목표 12회",rest:90},
       {name:"덤벨 Split Squat",part:"하체",
        vest:null,dumbbell:{label:"덤벨(한쪽)",default:20},
-       sets:[8,8,8],goal:"목표 10회",rest:90,note:"한 다리씩"},
+       sets:[8,8,8,8],goal:"목표 10회",rest:90,note:"한 다리씩"},
       {name:"트라이셉 익스텐션",part:"삼두근",
        vest:null,dumbbell:{label:"덤벨(한쪽)",default:12},
        sets:[8,8,8],goal:"목표 12회",rest:90},
@@ -432,7 +432,9 @@ const DATA = {
   }
 };
 
-const WEEK_MAP={0:'lower',1:'cardio',2:'upper',3:'lower',4:'rest',5:'cardio',6:'upper'};
+/* 요일 매핑: 0=일 1=월 2=화 3=수 4=목 5=금 6=토
+   화·금 → 하체 / 수·일 → 상체 / 월·목·토 → 유산소 */
+const WEEK_MAP={0:'upper',1:'cardio',2:'lower',3:'upper',4:'cardio',5:'lower',6:'cardio'};
 const DAY_KR=['일요일','월요일','화요일','수요일','목요일','금요일','토요일'];
 const DAY_EN=['SUN','MON','TUE','WED','THU','FRI','SAT'];
 
@@ -454,14 +456,13 @@ function init(){
   document.getElementById('dayBig').textContent=DAY_EN[todayIdx];
   document.getElementById('dayKr').textContent=DAY_KR[todayIdx];
   defaultMode=WEEK_MAP[todayIdx];
-  let startMode=defaultMode==='rest'?'upper':defaultMode;
+  let startMode=defaultMode;
   try{record=JSON.parse(localStorage.getItem(STORE_KEY))||{};}catch(e){record={};}
   if(record.__mode) startMode=record.__mode;
-  if(defaultMode!=='rest'){
+  {
     const tab=document.querySelector('.mode-tab[data-mode="'+defaultMode+'"]');
     if(tab){const b=document.createElement('div');b.className='default-badge';b.textContent='오늘';tab.appendChild(b);}
   }
-  if(defaultMode==='rest') showToast('오늘은 휴식일입니다 🌙');
   updateHR();
   document.getElementById('ageIn').addEventListener('input',updateHR);
   document.getElementById('restHrIn').addEventListener('input',updateHR);
@@ -589,7 +590,7 @@ function renderExercises(){
           const lastRep=(lastW&&lastW.sets&&lastW.sets[si])?lastW.sets[si].reps:null;
           const pholder=lastRep!=null?lastRep:target;
           const labelGoal=`<span style="font-size:16px;font-weight:700;color:var(--accent2);margin-left:3px;">(목표:${target})</span>`;
-          const labelPrev=lastRep!=null?`<span style="font-size:11px;color:#6a7a8e;margin-left:5px;">전회${lastRep}</span>`:'';
+          const labelPrev=lastRep!=null?`<span style="font-size:12px;font-weight:600;color:#9db3cc;margin-left:5px;">전회${lastRep}</span>`:'';
           return `<div class="set-row">
             <span class="set-lbl"><span style="font-size:17px;font-weight:900;color:#f0f4fa;">${si+1}세트</span>${labelGoal}${labelPrev}</span>
             <input class="set-in" type="number" inputmode="numeric" id="reps-${ei}-${si}"
