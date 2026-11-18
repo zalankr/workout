@@ -256,6 +256,7 @@ main{flex:1;padding:8px 16px 40px;}
       <div style="text-align:right;">
         <div class="today">오늘의 루틴</div>
         <div class="day-big" id="routineTitle" style="color:var(--accent2);">UPPER</div>
+        <div class="day-kr" id="routinePlan" style="color:var(--dim);font-size:11px;"></div>
       </div>
     </div>
   </header>
@@ -278,7 +279,7 @@ main{flex:1;padding:8px 16px 40px;}
           <span class="ic">🦵</span><span class="nm">하체</span><span class="sub">LOWER BODY</span>
         </div>
         <div class="mode-tab cardio" data-mode="cardio" onclick="selectMode('cardio')">
-          <span class="ic">🚲</span><span class="nm">유산소</span><span class="sub">ZONE 2</span>
+          <span class="ic">🔔</span><span class="nm">유산소</span><span class="sub">KB + CYCLE</span>
         </div>
       </div>
     </div>
@@ -289,10 +290,10 @@ main{flex:1;padding:8px 16px 40px;}
     <main>
       <div class="warmup" id="warmupBox">🔥 워밍업: <b id="warmupTxt">동적 스트레칭 5분</b></div>
       <div id="exerciseList"></div>
-      <!-- CARDIO -->
+      <!-- CARDIO: 목표 심박존 (유산소 루틴에서만 노출) -->
       <div class="cardio-view" id="cardioView">
         <div class="hr-card">
-          <h3>❤️ Zone 2 목표 심박존 <span style="color:var(--dim);font-weight:400;font-size:11px;">(1973년생 · 만 52세)</span></h3>
+          <h3>❤️ Zone 2 목표 심박존 <span style="color:var(--dim);font-weight:400;font-size:11px;">(1973년생 · 만 53세)</span></h3>
           <div class="hr-zone">
             <div class="zl">단순 공식 (220 − 나이, 최대심박의 60~70%)</div>
             <div class="zv" id="hrSimple">100 – 117 <small>bpm</small></div>
@@ -302,23 +303,26 @@ main{flex:1;padding:8px 16px 40px;}
             <div class="zv" id="hrKarvonen" style="color:var(--blue);">125 – 135 <small>bpm</small></div>
           </div>
           <div class="hr-adjust">
-            <label>나이</label><input type="number" id="ageIn" value="52">
+            <label>나이</label><input type="number" id="ageIn" value="53">
             <label>안정시심박</label><input type="number" id="restHrIn" value="60">
           </div>
           <div class="hr-note"><b>Zone2</b>는 "대화는 가능하지만 약간 힘든" 강도로, 미토콘드리아 기능·지방대사·유산소 기초체력을 높입니다(Peter Attia 권장).</div>
         </div>
-        <div class="cardio-timer-card">
-          <div class="ct-display" id="ctDisplay">75:00</div>
-          <div class="ct-sub">사이클 타이머</div>
-          <div class="ct-duration">
-            <label>목표 시간</label>
-            <input type="number" id="ctDuration" value="75" min="1" max="180">
-            <span style="font-size:12px;color:var(--dim);">분</span>
-          </div>
-          <div class="ct-btns">
-            <button class="ct-start" id="ctStartBtn" onclick="cardioStart()">▶ 시작</button>
-            <button class="ct-reset" onclick="cardioReset()">⟲ 리셋</button>
-          </div>
+      </div>
+
+      <!-- 사이클 타이머 — 모든 루틴 공통 마무리 (상·하체 15분 / 유산소 30분) -->
+      <div class="cardio-timer-card" id="cycleCard">
+        <div id="ctLabel" style="font-size:13px;font-weight:700;color:var(--cardio);margin-bottom:10px;">🚲 마무리 사이클</div>
+        <div class="ct-display" id="ctDisplay">15:00</div>
+        <div class="ct-sub">사이클 타이머</div>
+        <div class="ct-duration">
+          <label>목표 시간</label>
+          <input type="number" id="ctDuration" value="15" min="1" max="180">
+          <span style="font-size:12px;color:var(--dim);">분</span>
+        </div>
+        <div class="ct-btns">
+          <button class="ct-start" id="ctStartBtn" onclick="cardioStart()">▶ 시작</button>
+          <button class="ct-reset" onclick="cardioReset()">⟲ 리셋</button>
         </div>
       </div>
       <div class="finish-banner" id="finishBanner">
@@ -327,6 +331,9 @@ main{flex:1;padding:8px 16px 40px;}
         <div class="fb-s" id="finishSub">오늘 운동을 모두 끝냈습니다!</div>
       </div>
       <span class="reset-link" onclick="resetToday()">오늘 기록 초기화</span>
+      <div style="font-size:12px;color:#7a9abf;background:rgba(100,140,200,0.08);border-left:3px solid var(--accent2);border-radius:0 6px 6px 0;padding:8px 10px;margin:14px 0 4px;">
+        📌 증량·증회보다 <b>자세교정 주간</b>을 주기적으로 갖기
+      </div>
       <div class="data-foot">
         <span id="dataBadge">루틴 데이터: 확인 중…</span>
         <button class="data-refresh" onclick="refreshWorkoutData()">↻ 시트에서 새로고침</button>
@@ -341,6 +348,7 @@ main{flex:1;padding:8px 16px 40px;}
       <div class="log-filter" id="logModeFilter">
         <div class="lf-btn active" data-lmode="upper" onclick="setLogMode('upper')">💪 상체</div>
         <div class="lf-btn" data-lmode="lower" onclick="setLogMode('lower')">🦵 하체</div>
+        <div class="lf-btn" data-lmode="cardio" onclick="setLogMode('cardio')">🔔 유산소</div>
       </div>
       <div style="font-size:11px;color:var(--dim);margin:8px 0 6px;">기간</div>
       <div class="log-filter" id="logPeriodFilter">
@@ -389,14 +397,14 @@ main{flex:1;padding:8px 16px 40px;}
    ============================================================ */
 const FALLBACK_DATA = {
   upper:{
-    name:"상체",title:"UPPER",warmup:"상체 스트레칭 5분",
+    name:"상체",title:"UPPER",warmup:"스트레칭 10분",cycle:15,
     exercises:[
       {name:"Pull up",part:"등",
        vest:{label:"무게조끼",default:15},dumbbell:null,
        sets:[7,6,5,4],goal:"4set × 7회",rest:120},
       {name:"Push up",part:"가슴",
        vest:{label:"무게조끼",default:20},dumbbell:null,
-       sets:[18,16,14,13,12],goal:"5set × 18회",rest:120},
+       sets:[18,16,14,10,8],goal:"5set × 18회",rest:120},
       {name:"오버헤드숄더 프레스",part:"어깨",
        vest:null,dumbbell:{label:"덤벨(한쪽)",default:12},
        sets:[9,8,7,7],goal:"4set × 9회",rest:90},
@@ -418,20 +426,20 @@ const FALLBACK_DATA = {
     ]
   },
   lower:{
-    name:"하체",title:"LOWER",warmup:"하체 동적 스트레칭 5분",
+    name:"하체",title:"LOWER",warmup:"스트레칭 10분",cycle:15,
     exercises:[
-      {name:"양손 덤벨 어깨 Squat",part:"하체",
+      {name:"양손 덤벨어깨 Squat",part:"하체",
        vest:{label:"무게조끼",default:20},dumbbell:{label:"덤벨(한쪽)",default:20},
        sets:[15,15,12,12],goal:"4set × 15회",rest:120},
-      {name:"덤벨 Squat",part:"하체",
-       vest:{label:"무게조끼",default:20},dumbbell:{label:"덤벨(한쪽)",default:26},
-       sets:[10,10,10],goal:"3set × 10회",rest:120},
+      {name:"양손 덤벨 Squat",part:"하체",
+       vest:{label:"무게조끼",default:20},dumbbell:{label:"덤벨(한쪽)",default:28},
+       sets:[5,5,5],goal:"3set × 5회",rest:120},
       {name:"Crunch",part:"코어",
        vest:null,dumbbell:{label:"덤벨",default:10},
        sets:[20,20,15],goal:"3set × 20회",rest:90,note:"1~2세트 맨몸 / 3세트 덤벨10kg"},
       {name:"Reverse Crunch",part:"코어",
        vest:null,dumbbell:null,
-       sets:[17,17,10],goal:"3set × 17회",rest:90,note:"3세트 행잉레그레이즈"},
+       sets:[18,17,10],goal:"3set × 18회",rest:90,note:"3세트 행잉레그레이즈"},
       {name:"Hip Bridge",part:"코어",
        vest:null,dumbbell:{label:"덤벨",default:24},
        sets:[10,10,10],goal:"3set × 10회",rest:90,note:"회당10초 유지"},
@@ -445,17 +453,37 @@ const FALLBACK_DATA = {
        vest:null,dumbbell:{label:"덤벨",default:14},
        sets:[5,5,5],goal:"3set × 5회",rest:90},
     ]
+  },
+  cardio:{
+    name:"유산소",title:"CARDIO",warmup:"스트레칭 5분",cycle:30,
+    exercises:[
+      {name:"캐틀벨 스윙",part:"전신",
+       vest:null,dumbbell:{label:"캐틀벨",default:20},
+       sets:[12,12,12,12,12,12,12,12,12,12],goal:"10set × 12회",rest:120,
+       note:"힙 힌지로 폭발적 스윙 / 허리 아닌 둔근·햄스트링 사용"},
+    ]
   }
 };
 
-/* 요일 매핑: 0=일 1=월 2=화 3=수 4=목 5=금 6=토
-   화·금 → 하체 / 수·일 → 상체 / 월·목·토 → 유산소 */
-const FALLBACK_WEEK_MAP={0:'upper',1:'cardio',2:'lower',3:'upper',4:'cardio',5:'lower',6:'cardio'};
+/* 주간 기본 루틴 (0=일 1=월 2=화 3=수 4=목 5=금 6=토)
+   월 유산소 / 화 하체 / 수 유산소 / 목 상체 / 금 유산소 / 토 하체
+   일 주간 상체 + 야간 유산소  ← 하루 2세션
+   ※ 다른 일정으로 변경 가능 (탭에서 직접 선택) */
+const FALLBACK_WEEK_PLAN={
+  0:['upper','cardio'],  // 일 — 주간 상체 / 야간 유산소
+  1:['cardio'],          // 월
+  2:['lower'],           // 화
+  3:['cardio'],          // 수
+  4:['upper'],           // 목
+  5:['cardio'],          // 금
+  6:['lower'],           // 토
+};
 
 /* 런타임 데이터 — workout-data.json 로드 성공 시 교체됩니다 */
 let DATA = FALLBACK_DATA;
-let WEEK_MAP = FALLBACK_WEEK_MAP;
+let WEEK_PLAN = FALLBACK_WEEK_PLAN;
 let DATA_META = {source:'내장 데이터', generatedAt:null};
+const MODE_KR={upper:'상체',lower:'하체',cardio:'유산소'};
 
 const DAY_KR=['일요일','월요일','화요일','수요일','목요일','금요일','토요일'];
 const DAY_EN=['SUN','MON','TUE','WED','THU','FRI','SAT'];
@@ -481,9 +509,9 @@ const DATA_CACHE_KEY='workout_data_cache_v1';
    앱이 백지로 뜨지 않고 내장 데이터로 되돌아가게 하는 안전장치. */
 function validateData(d){
   if(!d||typeof d!=='object') return '최상위 객체가 아님';
-  for(const k of ['upper','lower']){
+  for(const k of ['upper','lower','cardio']){
     const m=d[k];
-    if(!m) return k+' 누락';
+    if(!m){ if(k==='cardio') continue; return k+' 누락'; }   // cardio는 선택 항목
     if(!Array.isArray(m.exercises)||!m.exercises.length) return k+'.exercises 비어있음';
     for(const [i,ex] of m.exercises.entries()){
       if(!ex.name) return `${k}.exercises[${i}].name 누락`;
@@ -495,14 +523,18 @@ function validateData(d){
 }
 
 function applyData(d,sourceLabel){
-  DATA={upper:d.upper,lower:d.lower};
-  if(d.weekMap){
-    const wm={};
+  DATA={upper:d.upper,lower:d.lower,cardio:d.cardio||FALLBACK_DATA.cardio};
+  /* weekPlan(배열, 하루 2세션 가능) 우선 / 구버전 weekMap(문자열)도 호환 */
+  const src=d.weekPlan||d.weekMap;
+  if(src){
+    const wp={};
     for(let i=0;i<7;i++){
-      const v=d.weekMap[i]??d.weekMap[String(i)];
-      wm[i]=(v==='upper'||v==='lower'||v==='cardio')?v:FALLBACK_WEEK_MAP[i];
+      let v=src[i]??src[String(i)];
+      if(typeof v==='string') v=[v];
+      const list=Array.isArray(v)?v.filter(x=>x==='upper'||x==='lower'||x==='cardio'):[];
+      wp[i]=list.length?list:FALLBACK_WEEK_PLAN[i];
     }
-    WEEK_MAP=wm;
+    WEEK_PLAN=wp;
   }
   DATA_META={source:sourceLabel,generatedAt:d.generatedAt||null};
 }
@@ -566,13 +598,27 @@ function init(){
     new Date().toLocaleDateString('ko-KR',{month:'long',day:'numeric'});
   document.getElementById('dayBig').textContent=DAY_EN[todayIdx];
   document.getElementById('dayKr').textContent=DAY_KR[todayIdx];
-  defaultMode=WEEK_MAP[todayIdx];
+  const plan=WEEK_PLAN[todayIdx]||['upper'];
+  defaultMode=plan[0];
   let startMode=defaultMode;
   try{record=JSON.parse(localStorage.getItem(STORE_KEY))||{};}catch(e){record={};}
   if(record.__mode) startMode=record.__mode;
-  {
-    const tab=document.querySelector('.mode-tab[data-mode="'+defaultMode+'"]');
-    if(tab){const b=document.createElement('div');b.className='default-badge';b.textContent='오늘';tab.appendChild(b);}
+
+  /* 오늘 해당하는 루틴 탭에 배지 — 2세션 날은 주간/야간으로 구분 */
+  document.querySelectorAll('.mode-tab .default-badge').forEach(b=>b.remove());
+  plan.forEach((m,i)=>{
+    const tab=document.querySelector('.mode-tab[data-mode="'+m+'"]');
+    if(!tab) return;
+    const b=document.createElement('div');b.className='default-badge';
+    b.textContent=plan.length>1?(i===0?'주간':'야간'):'오늘';
+    tab.appendChild(b);
+  });
+  /* 헤더에 오늘 전체 일정 표시 */
+  const planEl=document.getElementById('routinePlan');
+  if(planEl){
+    planEl.textContent=plan.length>1
+      ? '주간 '+MODE_KR[plan[0]]+' · 야간 '+MODE_KR[plan[1]]
+      : '오늘 '+MODE_KR[plan[0]];
   }
   updateHR();
   document.getElementById('ageIn').addEventListener('input',updateHR);
@@ -596,14 +642,26 @@ function selectMode(mode){
   currentMode=mode; record.__mode=mode; saveRecord();
   document.querySelectorAll('.mode-tab').forEach(t=>t.classList.remove('active'));
   document.querySelector('.mode-tab[data-mode="'+mode+'"]').classList.add('active');
-  document.getElementById('routineTitle').textContent=mode==='cardio'?'CARDIO':DATA[mode].title;
+  const cfg=DATA[mode];
+  document.getElementById('routineTitle').textContent=cfg.title;
   const isCardio=mode==='cardio';
+  /* 심박존 카드는 유산소에서만, 종목 리스트·워밍업·진행률은 모든 루틴 공통 */
   document.getElementById('cardioView').classList.toggle('show',isCardio);
-  document.getElementById('exerciseList').style.display=isCardio?'none':'block';
-  document.getElementById('warmupBox').style.display=isCardio?'none':'flex';
-  document.getElementById('progressWrap').style.display=isCardio?'none':'block';
+  document.getElementById('exerciseList').style.display='block';
+  document.getElementById('warmupBox').style.display='flex';
+  document.getElementById('progressWrap').style.display='block';
   document.getElementById('finishBanner').classList.remove('show');
-  if(!isCardio){document.getElementById('warmupTxt').textContent=DATA[mode].warmup;renderExercises();}
+  document.getElementById('warmupTxt').textContent=cfg.warmup;
+  renderExercises();
+
+  /* 사이클 목표시간을 루틴에 맞춰 세팅 (타이머 작동 중이면 건드리지 않음) */
+  const mins=cfg.cycle||15;
+  document.getElementById('ctLabel').textContent=
+    isCardio?`🚲 사이클 ${mins}분 (캐틀벨 후 본 유산소)`:`🚲 마무리 사이클 ${mins}분`;
+  if(!ctRunning){
+    document.getElementById('ctDuration').value=mins;
+    resetCardioDisplay();
+  }
 }
 
 /* ============ EXERCISE RENDER ============ */
@@ -1101,7 +1159,7 @@ function updateHR(){
 
 /* ============ CARDIO TIMER ============ */
 let ctTimer=null,ctRemain=0,ctRunning=false;
-function resetCardioDisplay(){ctRemain=(parseInt(document.getElementById('ctDuration').value)||75)*60;renderCt();}
+function resetCardioDisplay(){ctRemain=(parseInt(document.getElementById('ctDuration').value)||15)*60;renderCt();}
 function renderCt(){
   const m=Math.floor(ctRemain/60),s=ctRemain%60;
   document.getElementById('ctDisplay').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
@@ -1126,7 +1184,7 @@ function cardioStart(){
       document.getElementById('ctStartBtn').textContent='▶ 시작';
       document.getElementById('ctStartBtn').className='ct-start';
       playSound();if(navigator.vibrate)navigator.vibrate([300,150,300,150,300]);
-      showToast('🎉 Zone2 사이클 완료! 수고하셨습니다');
+      showToast('🎉 사이클 완료! 수고하셨습니다');
     }
   },1000);
 }
