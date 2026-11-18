@@ -69,6 +69,9 @@ main{flex:1;padding:8px 16px 40px;}
 .warmup{background:var(--panel);border:1px dashed var(--line);border-radius:14px;
   padding:14px 16px;margin:10px 4px 16px;display:flex;align-items:center;gap:10px;font-size:15px;color:#b8c8dc;}
 .warmup b{color:var(--accent2);}
+#planHint button{background:rgba(255,170,60,0.18);border:1px solid rgba(255,170,60,0.45);color:#ffd9a0;
+  font-size:12px;font-weight:700;border-radius:8px;padding:7px 12px;white-space:nowrap;cursor:pointer;}
+#planHint button:active{transform:scale(.96);}
 
 /* EXERCISE CARDS */
 .ex-card{background:var(--panel);border:1px solid var(--line);border-radius:18px;margin:0 4px 12px;overflow:hidden;transition:.25s;}
@@ -288,6 +291,9 @@ main{flex:1;padding:8px 16px 40px;}
       <div class="pb-text"><span id="pbLabel">진행률</span><span id="pbCount">0 / 0</span></div>
     </div>
     <main>
+      <div id="planHint" style="display:none;align-items:center;justify-content:space-between;gap:10px;
+        font-size:13px;color:#ffd9a0;background:rgba(255,170,60,0.10);border:1px solid rgba(255,170,60,0.30);
+        border-radius:10px;padding:10px 12px;margin-bottom:12px;"></div>
       <div class="warmup" id="warmupBox">🔥 워밍업: <b id="warmupTxt">동적 스트레칭 5분</b></div>
       <div id="exerciseList"></div>
       <!-- CARDIO: 목표 심박존 (유산소 루틴에서만 노출) -->
@@ -600,9 +606,16 @@ function init(){
   document.getElementById('dayKr').textContent=DAY_KR[todayIdx];
   const plan=WEEK_PLAN[todayIdx]||['upper'];
   defaultMode=plan[0];
-  let startMode=defaultMode;
   try{record=JSON.parse(localStorage.getItem(STORE_KEY))||{};}catch(e){record={};}
-  if(record.__mode) startMode=record.__mode;
+
+  /* 시작 모드 = 오늘의 주간 루틴.
+     단, 오늘 이미 기록을 남긴 루틴이 있으면(=운동 중) 그쪽을 이어서 연다.
+     2세션 날(일)은 주간 루틴을 끝냈으면 야간 루틴으로 자동 이동. */
+  const inProgress=m=>hasProgress(m)&&!isModeDone(m);
+  let startMode=plan.find(inProgress)                  // ① 오늘 루틴을 하던 중
+              || Object.keys(DATA).find(inProgress)    // ② 루틴 외 종목을 하던 중
+              || plan.find(m=>!isModeDone(m))          // ③ 아직 안 끝낸 오늘 루틴
+              || defaultMode;                          // ④ 오늘 루틴 전부 완료
 
   /* 오늘 해당하는 루틴 탭에 배지 — 2세션 날은 주간/야간으로 구분 */
   document.querySelectorAll('.mode-tab .default-badge').forEach(b=>b.remove());
@@ -638,6 +651,22 @@ function showTab(tab){
 }
 
 /* ============ MODE ============ */
+/* 오늘 해당 루틴에 입력한 기록이 하나라도 있는지 */
+function hasProgress(mode){
+  const r=record[mode];
+  if(!r||!DATA[mode]) return false;
+  return DATA[mode].exercises.some((_,i)=>{
+    const e=r[i];
+    return e && (e.done || (e.sets && Object.keys(e.sets).length>0));
+  });
+}
+/* 오늘 해당 루틴을 전부 끝냈는지 */
+function isModeDone(mode){
+  const r=record[mode];
+  if(!r||!DATA[mode]) return false;
+  return DATA[mode].exercises.every((_,i)=>r[i]&&r[i].done);
+}
+
 function selectMode(mode){
   currentMode=mode; record.__mode=mode; saveRecord();
   document.querySelectorAll('.mode-tab').forEach(t=>t.classList.remove('active'));
@@ -653,6 +682,7 @@ function selectMode(mode){
   document.getElementById('finishBanner').classList.remove('show');
   document.getElementById('warmupTxt').textContent=cfg.warmup;
   renderExercises();
+  renderPlanHint();
 
   /* 사이클 목표시간을 루틴에 맞춰 세팅 (타이머 작동 중이면 건드리지 않음) */
   const mins=cfg.cycle||15;
@@ -662,6 +692,19 @@ function selectMode(mode){
     document.getElementById('ctDuration').value=mins;
     resetCardioDisplay();
   }
+}
+
+/* 오늘 루틴과 다른 종목을 보고 있을 때 안내 + 한 번에 돌아가기 */
+function renderPlanHint(){
+  const box=document.getElementById('planHint');
+  if(!box) return;
+  const plan=WEEK_PLAN[todayIdx]||[];
+  if(plan.includes(currentMode)){ box.style.display='none'; return; }
+  const target=plan.find(m=>!isModeDone(m))||plan[0];
+  if(!target){ box.style.display='none'; return; }
+  box.style.display='flex';
+  box.innerHTML='<span>📅 오늘 루틴은 <b>'+MODE_KR[target]+'</b>입니다</span>'+
+    '<button onclick="selectMode(\''+target+'\')">오늘 루틴으로</button>';
 }
 
 /* ============ EXERCISE RENDER ============ */
